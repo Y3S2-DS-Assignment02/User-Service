@@ -1,22 +1,15 @@
-const { MongoClient } = require('mongodb');
-require('dotenv').config();
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-exports.connectToDatabase = async() => {
-    try {
-        const url = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+exports.connectToDatabase = async () => {
+  try {
+    const url = process.env.MONGODB_URI || "mongodb://localhost:27017";
 
-        const dbName = 'DS_Assignment01';
+    await mongoose.connect(url, {});
 
-        const client = new MongoClient(url);
-
-        await client.connect();
-
-        const db = client.db(dbName);
-
-        console.log('Connected to the database');
-        return db;
-    } catch (error) {
-        console.error('Error connecting to the database:', error);
-        throw error;
-    }
-}
+    console.log("Connected to the database");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+    throw error;
+  }
+};
