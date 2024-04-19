@@ -10,10 +10,10 @@ const registerUserLearner = async (req, res) => {
       phoneNumber,
       username
     );
-    res.status(response.status).send(response.message);
+    res.status(response.status).send({ data: {}, message: response.message });
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error creating learner");
+    res.status(500).send({ data: {}, message: "Error creating learner" });
   }
 };
 
