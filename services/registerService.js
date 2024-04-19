@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const userRepo = require("../database/repositories/userRepository");
 const learnerRepo = require("../database/repositories/learnerRepository");
+const mongoose = require("mongoose");
 
 const registerLearner = async (
   fullname,
@@ -9,8 +10,12 @@ const registerLearner = async (
   phoneNumber,
   username
 ) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  const transactionOptions = { session };
+
   try {
-    const duplicate = await userRepo.findOneByEmail(email);
+    const duplicate = await userRepo.findOneByEmail(session, email);
 
     if (duplicate) {
       return {
@@ -29,7 +34,7 @@ const registerLearner = async (
       refreshToken: "",
     };
 
-    const userCreated = await userRepo.createUser(newUser);
+    await userRepo.createUser(session, newUser, transactionOptions);
 
     const newLearner = {
       fullname,
@@ -39,20 +44,18 @@ const registerLearner = async (
       enrolledCourses: [],
     };
 
-    const learnerCreated = await learnerRepo.createLearner(newLearner);
+    await learnerRepo.createLearner(session, newLearner, transactionOptions);
 
-    if (!userCreated || !learnerCreated) {
-      return {
-        status: 500,
-        message: "Error creating learner",
-      };
-    }
+    await session.commitTransaction();
+    session.endSession();
 
     return {
       status: 201,
       message: "Learner created successfully",
     };
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return {
       status: 500,
       message: "Error creating learner",
