@@ -7,6 +7,7 @@ app.use(bodyParser.json());
 
 app.use("/api/demo", require("./routes/demoRoute"));
 app.use("/api/user-service", require("./routes/registerRoutes"));
+app.use("/api/user-service", require("./routes/authRoutes"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

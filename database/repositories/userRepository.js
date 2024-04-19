@@ -21,4 +21,18 @@ const findOneByEmail = async (email) => {
   }
 };
 
-module.exports = { createUser, findOneByEmail };
+const updateRefreshToken = async (userId, refreshToken) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { refreshToken: refreshToken },
+      { new: true }
+    );
+    return updatedUser;
+  } catch (error) {
+    // Handle error, perhaps log it
+    throw error;
+  }
+};
+
+module.exports = { createUser, findOneByEmail, updateRefreshToken };
