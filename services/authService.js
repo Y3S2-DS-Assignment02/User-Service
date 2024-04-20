@@ -67,9 +67,9 @@ const loginUser = async (email, password) => {
   }
 };
 
-const logoutUser = async (reqCookies) => {
+const logoutUser = async (cookies) => {
   try {
-    const cookies = reqCookies;
+    const cookies = cookies;
     if (!cookies?.jwt)
       return {
         status: 204,
@@ -104,4 +104,53 @@ const logoutUser = async (reqCookies) => {
   }
 };
 
-module.exports = { loginUser, logoutUser };
+const refreshAccessToken = async (cookies) => {
+  try {
+    if (!cookies?.jwt) return { status: 401, message: "Unauthorized" };
+    const refreshToken = cookies.jwt;
+    var accessToken = "";
+
+    const foundUser = await userRepo.findOneByRefreshToken(refreshToken);
+    if (!foundUser)
+      return {
+        status: 403,
+        message: "Forbidden",
+      };
+    // evaluate jwt
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err || foundUser.email !== decoded.email)
+          return {
+            status: 403,
+            message: "Forbidden",
+          };
+        const role = foundUser.role;
+        accessToken = jwt.sign(
+          {
+            UserInfo: {
+              email: decoded.email,
+              role: role,
+            },
+          },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: "300s" }
+        );
+      }
+    );
+    return {
+      accessToken,
+      status: 200,
+      message: "Token refreshed successfully",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+module.exports = { loginUser, logoutUser, refreshAccessToken };

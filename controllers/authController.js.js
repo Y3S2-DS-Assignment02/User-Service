@@ -1,4 +1,8 @@
-const { loginUser, logoutUser } = require("../services/authService");
+const {
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+} = require("../services/authService");
 
 const handleLogin = async (req, res) => {
   try {
@@ -33,4 +37,26 @@ const handleLogout = async (req, res) => {
   }
 };
 
-module.exports = { handleLogin, handleLogout };
+const handleRefreshToken = async (req, res) => {
+  try {
+    const response = await refreshAccessToken(req.cookies);
+    console.log(response);
+    if (response.status === 200) {
+      res.cookie("jwt", response.refreshToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+    }
+    res.status(response.status).send({
+      data: { token: response.accessToken },
+      message: response.message,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ data: {}, message: "Error refreshing token" });
+  }
+};
+
+module.exports = { handleLogin, handleLogout, handleRefreshToken };
