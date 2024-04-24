@@ -1,4 +1,7 @@
-const { registerLearner } = require("../services/registerService");
+const {
+  registerLearner,
+  registerInstructor,
+} = require("../services/registerService");
 
 const registerUserLearner = async (req, res) => {
   try {
@@ -10,6 +13,13 @@ const registerUserLearner = async (req, res) => {
       phoneNumber,
       username
     );
+    if (response.status === 201) {
+      res
+        .status(response.status)
+        .send({ data: response.token, message: response.message });
+    } else {
+      res.status(response.status).send({ data: {}, message: response.message });
+    }
     res.status(response.status).send(response.message);
   } catch (error) {
     console.log(error);
@@ -17,4 +27,29 @@ const registerUserLearner = async (req, res) => {
   }
 };
 
-module.exports = { registerUserLearner };
+const registerUserInstructor = async (req, res) => {
+  try {
+    const { fullname, email, password, phoneNumber, bankDetails } = req.body;
+    const response = await registerInstructor(
+      fullname,
+      email,
+      password,
+      phoneNumber,
+      username,
+      bankDetails
+    );
+    if (response.status === 201) {
+      res
+        .status(response.status)
+        .send({ data: response.token, message: response.message });
+    } else {
+      res.status(response.status).send({ data: {}, message: response.message });
+    }
+    res.status(response.status).send(response.message);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error creating instructor");
+  }
+};
+
+module.exports = { registerUserLearner, registerUserInstructor };

@@ -10,9 +10,6 @@ const router = express.Router();
 //Login
 router.post("/login", handleLogin);
 
-//Logout
-router.post("/logout", handleLogout);
-
 //Refresh token
 router.post("/refresh", handleRefreshToken);
 

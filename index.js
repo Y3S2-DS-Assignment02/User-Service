@@ -2,14 +2,19 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const { connectToDatabase } = require("./database/index");
 
 //Middleware
 app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 //middleware for cookies
 app.use(cookieParser());
 
-app.use("/api/demo", require("./routes/demoRoute"));
 app.use("/api/user-service", require("./routes/registerRoutes"));
 app.use("/api/user-service", require("./routes/authRoutes"));
 
