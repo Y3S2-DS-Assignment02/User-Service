@@ -1,18 +1,18 @@
 const User = require("./../models/userModel");
 
-const createUser = async (session, user, transactionOptions) => {
+const createUser = async ( user) => {
   try {
     const newUser = new User(user);
-    return await newUser.save({ session, ...transactionOptions });
+    return await newUser.save();
   } catch (error) {
     console.log(error);
     throw new Error("Error creating user");
   }
 };
 
-const findOneByEmail = async (session, email) => {
+const findOneByEmail = async (email) => {
   try {
-    return await User.findOne({ email }).session(session);
+    return await User.findOne({ email });
   } catch (error) {
     console.log(error);
     throw new Error("Error finding user");
