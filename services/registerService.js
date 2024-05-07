@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 const userRepo = require("../database/repositories/userRepository");
 const learnerRepo = require("../database/repositories/learnerRepository");
-const mongoose = require("mongoose");
+const instructorRepo = require("../database/repositories/instructorRepository");
+const { generateAccessToken } = require("../helpers/jwt");
 
 const registerLearner = async (
   fullname,
@@ -15,13 +16,10 @@ const registerLearner = async (
   const transactionOptions = { session };
 
   try {
-    const duplicate = await userRepo.findOneByEmail(session, email);
+    const duplicate = await findDuplicateUser(email);
 
     if (duplicate) {
-      return {
-        status: 400,
-        message: "User with this email already exists",
-      };
+      return duplicate;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -37,20 +35,30 @@ const registerLearner = async (
     await userRepo.createUser(session, newUser, transactionOptions);
 
     const newLearner = {
+      userId: userCreated._id,
       fullname,
       email,
       password: hashedPassword,
       phoneNumber,
       enrolledCourses: [],
+      progression: [],
     };
 
     await learnerRepo.createLearner(session, newLearner, transactionOptions);
 
-    await session.commitTransaction();
-    session.endSession();
+    if (!userCreated || !learnerCreated) {
+      return {
+        status: 500,
+        message: "Error creating learner",
+      };
+    }
+
+    const accessToken = generateAccessToken(newUser.email, newUser.role);
 
     return {
       status: 201,
+      userId: userCreated._id,
+      token: accessToken,
       message: "Learner created successfully",
     };
   } catch (error) {
@@ -63,4 +71,81 @@ const registerLearner = async (
   }
 };
 
-module.exports = { registerLearner };
+const registerInstructor = async (
+  fullname,
+  email,
+  password,
+  phoneNumber,
+  username
+) => {
+  try {
+    const duplicate = await findDuplicateUser(email);
+
+    if (duplicate) {
+      return duplicate;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = {
+      username,
+      email,
+      password: hashedPassword,
+      role: "Instructor",
+      refreshToken: "",
+    };
+
+    const userCreated = await userRepo.createUser(newUser);
+
+    const newInstructor = {
+      userId: userCreated._id,
+      fullname,
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      username,
+      bankDetails: {},
+      courses: [],
+    };
+
+    const instructorCreated = await instructorRepo.createInstructor(
+      newInstructor
+    );
+
+    if (!userCreated || !instructorCreated) {
+      return {
+        status: 500,
+        message: "Error creating instructor",
+      };
+    }
+
+    const accessToken = generateAccessToken(newUser.email, newUser.role);
+
+    return {
+      status: 201,
+      token: accessToken,
+      userId: userCreated._id,
+      message: "Instructor created successfully",
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message: "Error creating instructor",
+    };
+  }
+};
+
+const findDuplicateUser = async (email) => {
+  const duplicate = await userRepo.findOneByEmail(email);
+
+  if (duplicate) {
+    return {
+      status: 400,
+      message: "User with this email already exists",
+    };
+  }
+
+  return null;
+};
+
+module.exports = { registerLearner, registerInstructor };

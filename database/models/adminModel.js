@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const learnerSchema = new mongoose.Schema(
+const adminSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
@@ -19,21 +19,6 @@ const learnerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    enrolledCourses: [
-      {
-        type: String,
-      },
-    ],
-    progression: [
-      {
-        courseId: {
-          type: String,
-        },
-        progress: {
-          type: Number,
-        },
-      },
-    ],
     phoneNumber: {
       type: String,
       required: true,
@@ -46,6 +31,6 @@ const learnerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Learner = mongoose.model("Learner", learnerSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
-module.exports = Learner;
+module.exports = Admin;

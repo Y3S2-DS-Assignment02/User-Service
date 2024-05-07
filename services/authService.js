@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userRepo = require("../database/repositories/userRepository");
+const { generateAccessToken, generateRefreshToken } = require("../helpers/jwt");
 
 const loginUser = async (email, password) => {
   try {
@@ -21,32 +22,21 @@ const loginUser = async (email, password) => {
     if (match) {
       const role = foundUser.role;
       // create JWTs
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            email: foundUser.email,
-            role: role,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "300s" }
-      );
+      const accessToken = generateAccessToken(foundUser.email, role);
 
-      const refreshToken = jwt.sign(
-        { email: foundUser.email },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "1d" }
-      );
+      const refreshToken = generateRefreshToken(foundUser.email);
 
       // Saving refreshToken with current user
       const updatedUser = await userRepo.updateRefreshToken(
         foundUser._id,
         refreshToken
       );
+
       if (updatedUser) {
         return {
           accessToken,
           refreshToken,
+          userId: foundUser._id,
           role,
           status: 200,
           message: "Logged in successfully!",
@@ -141,6 +131,7 @@ const refreshAccessToken = async (cookies) => {
     );
     return {
       accessToken,
+      userId: foundUser._id,
       status: 200,
       message: "Token refreshed successfully",
     };

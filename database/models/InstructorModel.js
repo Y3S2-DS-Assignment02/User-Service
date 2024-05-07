@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const learnerSchema = new mongoose.Schema(
+const instructorSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
@@ -19,24 +19,28 @@ const learnerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    enrolledCourses: [
+    courses: [
       {
         type: String,
-      },
-    ],
-    progression: [
-      {
-        courseId: {
-          type: String,
-        },
-        progress: {
-          type: Number,
-        },
       },
     ],
     phoneNumber: {
       type: String,
       required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    bankDetails: {
+      bankName: {
+        type: String,
+        required: false,
+      },
+      accountNumber: {
+        type: String,
+        required: false,
+      },
     },
     createdAt: {
       type: Date,
@@ -46,6 +50,6 @@ const learnerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Learner = mongoose.model("Learner", learnerSchema);
+const Instructor = mongoose.model("Instructor", instructorSchema);
 
-module.exports = Learner;
+module.exports = Instructor;
