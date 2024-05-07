@@ -1,9 +1,9 @@
 const Learner = require("../models/learnerModel");
 
-const createLearner = async (session, learner, transactionOptions) => {
+const createLearner = async ( learner) => {
   try {
     const newLearner = new Learner(learner);
-    return await newLearner.save({ session, ...transactionOptions });
+    return await newLearner.save();
   } catch (error) {
     console.log(error);
     throw new Error("Error creating learner");
