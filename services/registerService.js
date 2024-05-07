@@ -31,11 +31,13 @@ const registerLearner = async (
     const userCreated = await userRepo.createUser(newUser);
 
     const newLearner = {
+      userId: userCreated._id,
       fullname,
       email,
       password: hashedPassword,
       phoneNumber,
       enrolledCourses: [],
+      progression: [],
     };
 
     const learnerCreated = await learnerRepo.createLearner(newLearner);
@@ -51,6 +53,7 @@ const registerLearner = async (
 
     return {
       status: 201,
+      userId: userCreated._id,
       token: accessToken,
       message: "Learner created successfully",
     };
@@ -67,8 +70,7 @@ const registerInstructor = async (
   email,
   password,
   phoneNumber,
-  username,
-  bankDetails
+  username
 ) => {
   try {
     const duplicate = await findDuplicateUser(email);
@@ -90,11 +92,13 @@ const registerInstructor = async (
     const userCreated = await userRepo.createUser(newUser);
 
     const newInstructor = {
+      userId: userCreated._id,
       fullname,
       email,
       password: hashedPassword,
       phoneNumber,
-      bankDetails,
+      username,
+      bankDetails: {},
       courses: [],
     };
 
@@ -114,6 +118,7 @@ const registerInstructor = async (
     return {
       status: 201,
       token: accessToken,
+      userId: userCreated._id,
       message: "Instructor created successfully",
     };
   } catch (error) {

@@ -31,10 +31,12 @@ const loginUser = async (email, password) => {
         foundUser._id,
         refreshToken
       );
+
       if (updatedUser) {
         return {
           accessToken,
           refreshToken,
+          userId: foundUser._id,
           role,
           status: 200,
           message: "Logged in successfully!",
@@ -129,6 +131,7 @@ const refreshAccessToken = async (cookies) => {
     );
     return {
       accessToken,
+      userId: foundUser._id,
       status: 200,
       message: "Token refreshed successfully",
     };

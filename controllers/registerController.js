@@ -16,11 +16,10 @@ const registerUserLearner = async (req, res) => {
     if (response.status === 201) {
       res
         .status(response.status)
-        .send({ data: response.token, message: response.message });
+        .send({ data: {token: response.token, userId: response.userId}, message: response.message });
     } else {
       res.status(response.status).send({ data: {}, message: response.message });
     }
-    res.status(response.status).send(response.message);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error creating learner");
@@ -29,23 +28,21 @@ const registerUserLearner = async (req, res) => {
 
 const registerUserInstructor = async (req, res) => {
   try {
-    const { fullname, email, password, phoneNumber, bankDetails } = req.body;
+    const { fullname, email, password, phoneNumber, username } = req.body;
     const response = await registerInstructor(
       fullname,
       email,
       password,
       phoneNumber,
-      username,
-      bankDetails
+      username
     );
     if (response.status === 201) {
       res
         .status(response.status)
-        .send({ data: response.token, message: response.message });
+        .send({ data: {token: response.token, userId: response.userId}, message: response.message });
     } else {
       res.status(response.status).send({ data: {}, message: response.message });
     }
-    res.status(response.status).send(response.message);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error creating instructor");
