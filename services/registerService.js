@@ -11,6 +11,10 @@ const registerLearner = async (
   phoneNumber,
   username
 ) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  const transactionOptions = { session };
+
   try {
     const duplicate = await findDuplicateUser(email);
 
@@ -28,7 +32,7 @@ const registerLearner = async (
       refreshToken: "",
     };
 
-    const userCreated = await userRepo.createUser(newUser);
+    await userRepo.createUser(session, newUser, transactionOptions);
 
     const newLearner = {
       userId: userCreated._id,
@@ -40,7 +44,7 @@ const registerLearner = async (
       progression: [],
     };
 
-    const learnerCreated = await learnerRepo.createLearner(newLearner);
+    await learnerRepo.createLearner(session, newLearner, transactionOptions);
 
     if (!userCreated || !learnerCreated) {
       return {
@@ -58,6 +62,8 @@ const registerLearner = async (
       message: "Learner created successfully",
     };
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return {
       status: 500,
       message: "Error creating learner",
