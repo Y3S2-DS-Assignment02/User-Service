@@ -3,6 +3,8 @@ const userRepo = require("../database/repositories/userRepository");
 const learnerRepo = require("../database/repositories/learnerRepository");
 const instructorRepo = require("../database/repositories/instructorRepository");
 const { generateAccessToken } = require("../helpers/jwt");
+const {sendEmail_Registraion} = require('./external/emailService')
+const {sendSMS_Registraion} = require('./external/smsService')
 
 const registerLearner = async (
   fullname,
@@ -50,7 +52,8 @@ const registerLearner = async (
     }
 
     const accessToken = generateAccessToken(newUser.email, newUser.role);
-
+    await sendEmail_Registraion(newUser.email);
+    await sendSMS_Registraion(phoneNumber);
     return {
       status: 201,
       userId: userCreated._id,
@@ -114,6 +117,8 @@ const registerInstructor = async (
     }
 
     const accessToken = generateAccessToken(newUser.email, newUser.role);
+    await sendEmail_Registraion(newUser.email);
+    await sendSMS_Registraion(phoneNumber);
 
     return {
       status: 201,
