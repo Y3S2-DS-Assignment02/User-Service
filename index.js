@@ -19,6 +19,8 @@ app.use(cookieParser());
 
 app.use("/api/user-service", require("./routes/registerRoutes"));
 app.use("/api/user-service", require("./routes/authRoutes"));
+app.use("/api/user-service", require("./routes/userRoutes"));
+
 
 app.use(verifyJWT);
 
