@@ -58,6 +58,7 @@ const registerLearner = async (
       status: 201,
       userId: userCreated._id,
       token: accessToken,
+      role: userCreated.role,
       message: "Learner created successfully",
     };
   } catch (error) {
@@ -124,6 +125,7 @@ const registerInstructor = async (
       status: 201,
       token: accessToken,
       userId: userCreated._id,
+      role: userCreated.role,
       message: "Instructor created successfully",
     };
   } catch (error) {
