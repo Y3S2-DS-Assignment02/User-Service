@@ -16,7 +16,7 @@ const registerUserLearner = async (req, res) => {
     if (response.status === 201) {
       res
         .status(response.status)
-        .send({ data: {token: response.token, userId: response.userId}, message: response.message });
+        .send({ data: {token: response.token, userId: response.userId, role: response.role}, message: response.message });
     } else {
       res.status(response.status).send({ data: {}, message: response.message });
     }
@@ -39,7 +39,7 @@ const registerUserInstructor = async (req, res) => {
     if (response.status === 201) {
       res
         .status(response.status)
-        .send({ data: {token: response.token, userId: response.userId}, message: response.message });
+        .send({ data: {token: response.token, userId: response.userId, role: response.role}, message: response.message });
     } else {
       res.status(response.status).send({ data: {}, message: response.message });
     }
