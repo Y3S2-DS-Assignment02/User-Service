@@ -6,6 +6,7 @@ const {
 
 const handleLogin = async (req, res) => {
   try {
+    console.log("Request Received!")
     const { email, password } = req.body;
     const response = await loginUser(email, password);
     res.cookie("jwt", response.refreshToken, {
